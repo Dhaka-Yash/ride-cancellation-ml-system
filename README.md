@@ -50,6 +50,20 @@ curl http://127.0.0.1:8000/
 streamlit run app\streamlit_app.py
 ```
 
+## Deploy Streamlit (Cloud)
+
+When deploying `app/streamlit_app.py` to Streamlit Cloud, do not use `127.0.0.1` for API calls.  
+Set a public FastAPI endpoint in app secrets:
+
+```toml
+PREDICTION_API_URL = "https://your-fastapi-domain/predict"
+```
+
+The Streamlit app reads API URL in this order:
+- `st.secrets["PREDICTION_API_URL"]`
+- `PREDICTION_API_URL` environment variable
+- Local fallback: `http://127.0.0.1:8000/predict`
+
 ## CLI Prediction
 
 Simple flags:
