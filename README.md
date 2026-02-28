@@ -61,6 +61,10 @@ Sample response:
 }
 ```
 
+API routes:
+- `GET /` health/info
+- `POST /predict` prediction endpoint (used by Streamlit)
+
 ## Run Streamlit UI
 
 ```powershell
@@ -78,12 +82,37 @@ Set a public FastAPI endpoint in app secrets:
 PREDICTION_API_URL = "https://your-fastapi-domain/predict"
 ```
 
+Important: the secret must include `/predict`.  
+If you set only the base URL (for example `https://your-fastapi-domain`), Streamlit can fail with `405 Method Not Allowed`.
+
 The Streamlit app reads API URL in this order:
 - `st.secrets["PREDICTION_API_URL"]`
 - `PREDICTION_API_URL` environment variable
 - Local fallback: `http://127.0.0.1:8000/predict`
 
 If `secrets.toml` is missing, the app continues to run and uses env/local fallback.
+
+## Deploy API Publicly (Render Example)
+
+Create a Render Web Service from this repository and use:
+
+- Build command:
+
+```bash
+pip install -r requirements.txt && python src/train.py
+```
+
+- Start command:
+
+```bash
+python -m uvicorn api.app:app --host 0.0.0.0 --port $PORT
+```
+
+Then set Streamlit secret:
+
+```toml
+PREDICTION_API_URL = "https://<your-render-service>.onrender.com/predict"
+```
 
 ## CLI Prediction
 
