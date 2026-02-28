@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from src.inference import predict_from_payload, load_model
+from src.inference import predict_with_probability_from_payload, load_model
 
 app = FastAPI()
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -39,13 +39,19 @@ class PredictionRequest(BaseModel):
 
 class PredictionResponse(BaseModel):
     is_cancelled: int
+    cancellation_probability: float
 
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(data: PredictionRequest):
     try:
-        prediction = predict_from_payload(data.model_dump(), _get_model())
-        return PredictionResponse(is_cancelled=int(prediction))
+        prediction, probability = predict_with_probability_from_payload(
+            data.model_dump(), _get_model()
+        )
+        return PredictionResponse(
+            is_cancelled=int(prediction),
+            cancellation_probability=float(probability),
+        )
     except HTTPException:
         raise
     except ValueError as exc:

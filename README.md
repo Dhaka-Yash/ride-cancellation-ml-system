@@ -44,11 +44,30 @@ Quick health check:
 curl http://127.0.0.1:8000/
 ```
 
+Sample prediction request:
+
+```powershell
+curl -X POST http://127.0.0.1:8000/predict `
+  -H "Content-Type: application/json" `
+  -d "{\"vehicle_type\":\"Bike\",\"pickup_location\":\"Palam Vihar\",\"drop_location\":\"Jhilmil\",\"payment_method\":\"UPI\",\"avg_vtat\":8,\"avg_ctat\":10,\"cancelled_rides_by_customer\":1,\"cancelled_rides_by_driver\":0,\"booking_value\":250,\"ride_distance\":3.5,\"driver_ratings\":4.5,\"customer_rating\":4.6,\"booking_day_of_week\":2,\"booking_month\":6,\"is_weekend\":0,\"booking_hour\":10}"
+```
+
+Sample response:
+
+```json
+{
+  "is_cancelled": 0,
+  "cancellation_probability": 0.347
+}
+```
+
 ## Run Streamlit UI
 
 ```powershell
 streamlit run app\streamlit_app.py
 ```
+
+The UI now includes all core model features (ride details, history, and trip/time fields) so predictions are not biased by missing inputs.
 
 ## Deploy Streamlit (Cloud)
 
@@ -63,6 +82,8 @@ The Streamlit app reads API URL in this order:
 - `st.secrets["PREDICTION_API_URL"]`
 - `PREDICTION_API_URL` environment variable
 - Local fallback: `http://127.0.0.1:8000/predict`
+
+If `secrets.toml` is missing, the app continues to run and uses env/local fallback.
 
 ## CLI Prediction
 

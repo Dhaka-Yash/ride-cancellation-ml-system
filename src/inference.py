@@ -57,3 +57,16 @@ def predict_from_payload(payload: dict[str, Any], model) -> int:
     row = build_model_row(payload, categorical_cols, numerical_cols)
     df = pd.DataFrame([row], columns=expected_cols)
     return int(model.predict(df)[0])
+
+
+def predict_with_probability_from_payload(payload: dict[str, Any], model) -> tuple[int, float]:
+    categorical_cols, numerical_cols, expected_cols = extract_expected_columns(model)
+    row = build_model_row(payload, categorical_cols, numerical_cols)
+    df = pd.DataFrame([row], columns=expected_cols)
+    prediction = int(model.predict(df)[0])
+
+    probability = 0.0
+    if hasattr(model, "predict_proba"):
+        probability = float(model.predict_proba(df)[0][1])
+
+    return prediction, probability
